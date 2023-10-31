@@ -84,6 +84,12 @@ func _remove_from_scene(bag: Bag) -> void:
 		remove_child(bag)
 
 
+func _ready_bag(bag_id: String, bag_path: NodePath) -> void:
+	var bag: Bag = get_node_or_null(bag_path)
+	if is_instance_valid(bag):
+		_add_bag(bag_id, bag)
+
+
 func _ready_bags() -> void:
 	pass
 
