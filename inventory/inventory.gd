@@ -9,65 +9,79 @@ func _ready() -> void:
 	_ready_bags()
 
 
-func put_item(bag_id: String, position: int, item: Node) -> void:
+func put_item(bag_id: StringName, position: int, item: Node) -> void:
 	var bag: Bag = get_bag(bag_id)
-	bag.put_item(position, item)
+	if is_instance_valid(bag):
+		bag.put_item(position, item)
 
 
-func remove_item_at(bag_id: String, position: int) -> void:
+func remove_item_at(bag_id: StringName, position: int) -> void:
 	var bag: Bag = get_bag(bag_id)
-	bag.remove_item_at(position)
+	if is_instance_valid(bag):
+		bag.remove_item_at(position)
 
 
-func get_bag(bag_id: String) -> Bag:
+func get_bag(bag_id: StringName) -> Bag:
 	return _inventory.get(bag_id) as Bag
 
 
-func get_item(bag_id: String, position: int) -> Node:
+func get_item(bag_id: StringName, position: int) -> Node:
 	var bag: Bag = get_bag(bag_id)
+	var item: Node = null
+	if is_instance_valid(bag):
+		item = bag.get_item(position)
 	
-	return bag.get_item(position)
+	return item
 
 
-func get_item_list(bag_id: String) -> Array:
+func get_item_list(bag_id: StringName) -> Array:
 	var bag: Bag = get_bag(bag_id)
+	var item_list: Array = []
+	if is_instance_valid(bag):
+		item_list = bag.get_item_list()
 	
-	return bag.get_item_list()
+	return item_list
 
 
-func get_bag_size(bag_id: String) -> int:
+func get_bag_size(bag_id: StringName) -> int:
 	var bag: Bag = get_bag(bag_id)
+	var size: int = 0
+	if is_instance_valid(bag):
+		size = bag.size()
 	
-	return bag.size()
+	return size
 
 
-func connect_bag_item_set_signal(bag_id: String, method: Callable
+func create_bag_iterator(bag_id: StringName) -> Bag.Iterator:
+	var iterator: Bag.Iterator = null
+	var bag: Bag = get_bag(bag_id)
+	if is_instance_valid(bag):
+		iterator = bag.create_iterator()
+	
+	return iterator
+
+
+func connect_bag_item_set_signal(bag_id: StringName, method: Callable
 		) -> void:
 	var bag: Bag = get_bag(bag_id)
-	if !bag.item_set.is_connected(method):
+	if is_instance_valid(bag) and !bag.item_set.is_connected(method):
 		var _err := bag.item_set.connect(method)
 
 
-func connect_bag_item_removed_signal(bag_id: String, method: Callable
+func connect_bag_item_removed_signal(bag_id: StringName, method: Callable
 		) -> void:
 	var bag: Bag = get_bag(bag_id)
-	if !bag.item_removed.is_connected(method):
+	if is_instance_valid(bag) and !bag.item_removed.is_connected(method):
 		var _err := bag.item_removed.connect(method)
 
 
-func create_bag_iterator(bag_id: String) -> Bag.Iterator:
-	var bag: Bag = get_bag(bag_id)
-	
-	return bag.create_iterator()
-
-
-func _add_bag(bag_id: String, bag: Bag) -> void:
+func _add_bag(bag_id: StringName, bag: Bag) -> void:
 	if !_inventory.has(bag_id):
 		_add_to_scene(bag)
 		_inventory[bag_id] = bag
 
 
-func _remove_bag(bag_id: String) -> void:
+func _remove_bag(bag_id: StringName) -> void:
 	var bag: Bag = get_bag(bag_id)
 	if is_instance_valid(bag):
 		_remove_from_scene(bag)
@@ -84,7 +98,7 @@ func _remove_from_scene(bag: Bag) -> void:
 		remove_child(bag)
 
 
-func _ready_bag(bag_id: String, bag_path: NodePath) -> void:
+func _ready_bag(bag_id: StringName, bag_path: NodePath) -> void:
 	var bag: Bag = get_node_or_null(bag_path)
 	if is_instance_valid(bag):
 		_add_bag(bag_id, bag)
